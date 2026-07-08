@@ -1,76 +1,64 @@
-## Step 3: Enforce Quality And Coverage With Rulesets
+## Step 3: Enable Code Coverage
 
-Visibility alone did not prevent risky code from merging under deadline pressure. Now you turn the quality and coverage signals into branch policy, then confirm your fix satisfies that policy before merging.
+Findings from AI and standard analysis tell you about code quality, but they do not tell you how much of the code is actually tested. Code coverage fills that gap by showing which lines are exercised by your test suite on every pull request.
 
-### 📖 Theory: From Signals To Policy
+### 📖 Theory: Test Coverage As A Merge Signal
 
-Rulesets turn advisory checks into enforceable merge standards.
+Test coverage complements static analysis by showing how much code is exercised by tests.
 
-- Quality severity thresholds can block pull requests when unresolved findings exceed team limits.
-- Coverage restrictions can prevent merges when coverage drops too far.
-- Applying a ruleset to an open pull request requires its checks to pass before the pull request can merge.
+- Coverage uploaded in Cobertura format is surfaced in pull request context by `github-code-quality[bot]`.
+- Workflow permissions must allow writing code quality coverage data (`code-quality: write`).
+- Enabling coverage on the default branch means every new pull request automatically gets a coverage summary.
 
 Read more:
 
-- https://docs.github.com/en/code-security/how-tos/maintain-quality-code/set-pr-thresholds
-- https://docs.github.com/en/code-security/how-tos/maintain-quality-code/restrict-code-coverage
-- https://docs.github.com/en/code-security/how-tos/maintain-quality-code/unblock-your-pr
-- https://docs.github.com/en/repositories/configuring-branches-and-merges-in-your-repository/managing-rulesets/about-rulesets
+- https://docs.github.com/en/code-security/how-tos/maintain-quality-code/set-up-code-coverage
+- https://docs.github.com/en/code-security/how-tos/maintain-quality-code/interpret-results
+- https://github.com/actions/upload-code-coverage
 
-## ⌨️ Activity: Enable rulesets
+### ⌨️ Activity: Enable And Track Code Coverage
 
-1. In the top navigation, select the **Settings** tab.
+1. In your repository, open the **Code** tab and make sure you are on the `main` branch.
 
-   <img width="300" src="images/settings-tab.png">
+1. Open the test workflow file at `.github/workflows/tests.yml` and select the pencil (**Edit this file**) icon.
 
-1. In the left sidebar, expand **Rules** and select **Rulesets**.
+1. Update the existing `permissions:` block with the block below to include the `code-quality: write` permission, which allows publishing coverage results.
 
-   <img width="250" src="images/left-nav-rulesets.png">
+   ```yaml
+   permissions:
+     contents: read
+     code-quality: write
+   ```
 
-1. Click the **New ruleset** button and select the **New branch ruleset** option.
+1. Add the following step to the end of the `test` job, after the `Run unit tests with coverage output` step. Keep the same indentation as the other steps.
 
-   <img width="250" src="images/new-ruleset-button.png">
+   ```yaml
+   - name: Upload coverage report to Code Quality
+     uses: actions/upload-code-coverage@v1
+     with:
+       file: coverage/coverage-python.xml
+       language: Python
+       label: code-coverage/pytest
+   ```
 
-1. Use the following details and selected options.
-   - **Ruleset Name**: `Quality and Coverage`
-   - **Enforcement status**: `Active`.
-   - **Target branches**: `Include default branch`
+1. Do the same for the `test-js` job, adding this step after its `Run unit tests with coverage output` step so the JavaScript coverage report is reported alongside the Python one.
 
-1. Enable **Require code quality results**. Set the severity threshold to `Warnings and higher`.
+   ```yaml
+   - name: Upload coverage report to Code Quality
+     uses: actions/upload-code-coverage@v1
+     with:
+       file: coverage/coverage-javascript.xml
+       language: JavaScript
+       label: code-coverage/jest
+   ```
 
-   <img width="300" alt="rule to require code quality results" src="images/rulesets-require-coverage.png">
-
-1. Enable **Restrict code coverage**. Set the **Minimum coverage percentage** to `60`
-
-   <img width="300" alt="rule to require code coverage" src="images/rulesets-restrict-code-coverage.png">
-
-1. Scroll to the bottom and select **Create** to save the ruleset.
-
-<details>
-<summary>Having trouble? 🤷</summary><br/>
-
-- Make sure the target includes the default branch (`main`).
-- If checks are not blocking later, confirm the enforcement status is `Active`.
-
-</details>
-
-## ⌨️ Activity: Confirm fixed quality issue and merge
-
-Your ruleset now applies to the remediation pull request you opened in the previous step. Confirm the checks pass and complete the merge.
-
-1. Open the **Pull requests** tab and select your `fix-signup-validation-bugs` pull request.
-1. Because the ruleset is `Active`, the pull request cannot merge until the code quality and coverage checks pass. Wait for the checks to finish.
-1. Confirm the checks pass, showing the quality issue is resolved and coverage meets the threshold.
-
-   > 💡 **Tip:** If a check re-runs is needed, open the failed check to see which finding remains, fix it on the same branch, and commit again.
-
-1. Once all checks pass, select **Merge pull request** and confirm.
-1. Mona will detect the merge and wrap up the exercise.
+1. Commit your changes directly to the `main` branch. As soon as the coverage upload is committed, Mona will prepare the next step.
 
 <details>
 <summary>Having trouble? 🤷</summary><br/>
 
-- If a check still fails, open the failed check to see which finding remains, fix it, and commit again.
-- Make sure your branch is named exactly `fix-signup-validation-bugs` so the exercise can detect the merge.
+- Confirm the `Run unit tests with coverage output` step in `test` still generates `coverage/coverage-python.xml`, and the same step in `test-js` still generates `coverage/coverage-javascript.xml`.
+- Confirm both upload steps use the correct `file:` path and `language:`, and that the workflow grants `code-quality: write`.
+- You should see two coverage summaries from `github-code-quality[bot]`, one labeled `code-coverage/pytest` and one labeled `code-coverage/jest`.
 
 </details>

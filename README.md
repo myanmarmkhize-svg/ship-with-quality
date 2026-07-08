@@ -17,9 +17,10 @@ _Ship faster with automated quality signals to identify defects and monitor test
 
 In this exercise, you will:
 
-1. Enable Code Quality and preview the findings.
-1. Add pull request coverage reporting and open a pull request to start remediating a quality issue.
-1. Enforce quality and coverage thresholds with rulesets, then confirm the fix and merge.
+1. Enable Code Quality and preview standard findings.
+1. Open a pull request to start remediating a quality issue and view feedback from AI findings.
+1. Add pull request coverage reporting as a test confidence signal.
+1. Enforce quality and coverage thresholds with rulesets, explore evaluate mode, then confirm the fix and merge.
 
 ### How to start this exercise
 

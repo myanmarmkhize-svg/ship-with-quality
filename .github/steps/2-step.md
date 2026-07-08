@@ -1,162 +1,127 @@
-## Step 2: Enable Code Coverage And Start Fixing A Quality Issue
+## Step 2: AI Findings
 
-The findings confirmed real defects behind the student complaints. Before you enforce anything, you want every pull request to show how well tests cover the code, and you will open your first remediation pull request.
+Standard findings identified structural issues in the codebase. Now it is time to learn about AI findings and start fixing one of the problems they uncovered.
 
-### 📖 Theory: Test Coverage As A Merge Signal
+### 📖 Theory: AI Feedback As You Work
 
-Test coverage complements static analysis by showing how much code is exercised by tests.
+AI findings complement standard static analysis with context-aware insights that catch subtler issues.
 
-- Coverage uploaded in Cobertura format is surfaced in pull request context by `github-code-quality[bot]`.
-- Workflow permissions must allow writing code quality coverage data (`code-quality: write`).
-- Enabling coverage on the default branch means every new pull request automatically gets a coverage summary.
+- **AI findings** appear in the **Security** tab under **Code quality** > **AI findings**.
+- Unlike standard findings which run only on the default branch, AI findings update as you work — results appear on pushes to `main` **and** on pull requests that target `main`.
+- This means your team gets feedback on new code before it merges, making AI findings a continuous quality signal throughout the development workflow.
+- AI findings can surface issues such as logic errors, security anti-patterns, and code that is technically valid but likely unintentional.
 
 Read more:
 
-- https://docs.github.com/en/code-security/how-tos/maintain-quality-code/set-up-code-coverage
 - https://docs.github.com/en/code-security/how-tos/maintain-quality-code/interpret-results
-- https://github.com/actions/upload-code-coverage
 
-## ⌨️ Activity: Enable and track code coverage
+### ⌨️ Activity: Start Fixing A Quality Issue
 
-1. In your repository, open the **Code** tab and make sure you are on the `main` branch.
+The `login()` function in `auth.py` has three quality issues flagged by the standard analysis scan. You will fix all three, add a test, and open a pull request so AI findings can start running on the changed file.
 
-1. Open the test workflow file at `.github/workflows/tests.yml` and select the pencil (**Edit this file**) icon.
+- it contains a meaningless identical-operands check (`username == username`)
+- it has an overly-broad `except` that returns a different response shape on error
+- it has a duplicated `return` block that can never be reached
 
-1. Update the existing `permissions:` block (line 27) with the block below, to include the `code-quality: write` permission, to allow publishing coverage results.
+1. In the top navigation, select the **Code** tab and make sure you are on the `main` branch.
 
-   ```yaml
-   permissions:
-     contents: read
-     code-quality: write
+1. Create a branch named `fix-auth-quality-issues`.
+
+1. Open the file `src/backend/routers/auth.py`.
+
+1. Find the `login()` function and locate the current problematic code block:
+
+   ```python
+   teacher = teachers_collection.find_one({"_id": username})
+
+   try:
+       if username == username:
+           pass
+
+       if not teacher or not verify_password(teacher.get("password", ""), password):
+           raise HTTPException(status_code=401, detail="Invalid username or password")
+   except Exception:
+       return {"error": "authentication failed"}
+
+   response = {
+       "username": teacher["username"],
+       "display_name": teacher["display_name"],
+       "role": teacher["role"]
+   }
+
+   return response
+
+   return {
+       "username": teacher["username"],
+       "display_name": teacher["display_name"],
+       "role": teacher["role"]
+   }
    ```
 
-1. Add the following step to the end of the `test` job, after the `Run unit tests with coverage output` step. Keep the same indentation as the other steps.
+1. Replace it with the corrected version:
 
-   ```yaml
-   - name: Upload coverage report to Code Quality
-     uses: actions/upload-code-coverage@v1
-     with:
-       file: coverage/coverage-python.xml
-       language: Python
-       label: code-coverage/pytest
+   ```python
+   teacher = teachers_collection.find_one({"_id": username})
+
+   if not teacher or not verify_password(teacher.get("password", ""), password):
+       raise HTTPException(status_code=401, detail="Invalid username or password")
+
+   return {
+       "username": teacher["username"],
+       "display_name": teacher["display_name"],
+       "role": teacher["role"]
+   }
    ```
 
-1. Do the same for the `test-js` job, adding this step after its `Run unit tests with coverage output` step so the JavaScript coverage report is reported alongside the Python one.
+1. Open `tests/backend/routers/test_auth.py` and remove the `@pytest.mark.skip` decorator from `test_login_rejects_invalid_password` so the test runs again:
 
-   ```yaml
-   - name: Upload coverage report to Code Quality
-     uses: actions/upload-code-coverage@v1
-     with:
-       file: coverage/coverage-javascript.xml
-       language: JavaScript
-       label: code-coverage/jest
+   Before:
+
+   ```python
+   @pytest.mark.skip(reason="Temp. Will fix later. (classic mistake)")
+   def test_login_rejects_invalid_password():
    ```
 
-1. Commit your changes directly to the `main` branch. As soon as the coverage upload is committed, Mona will prepare the next step.
+   After:
+
+   ```python
+   def test_login_rejects_invalid_password():
+   ```
+
+1. Commit these changes to the `fix-auth-quality-issues` branch with a message like `fix: auth login quality issues`.
+
+1. In the top navigation, select the **Pull requests** tab. Start a new pull request to merge your branch into `main`.
+   - **base**: `main`
+   - **compare**: `fix-auth-quality-issues`
+
+1. Once the pull request is open, Mona will detect it and prepare the next step.
 
 <details>
 <summary>Having trouble? 🤷</summary><br/>
 
-- Confirm the "Run unit tests with coverage output" step in `test` still generates `coverage/coverage-python.xml`, and the same step in `test-js` still generates `coverage/coverage-javascript.xml`.
-- Confirm both upload steps use the correct `file:` path and `language:`, and that the workflow grants `code-quality: write`.
-- You should see two coverage summaries from `github-code-quality[bot]`, one labeled `code-coverage/pytest` and one labeled `code-coverage/jest`.
+- Make sure the branch is named exactly `fix-auth-quality-issues`.
+- Confirm the pull request targets the `main` branch.
 
 </details>
 
-## ⌨️ Activity: Start fixing a quality issue
+### ⌨️ Activity: Preview AI Findings
 
-The signup endpoint has three defects that match the reported problems. You will fix all three, add a test, and open a pull request so the coverage signal can appear.
+With the pull request open, the Code Quality analysis runs on the `fix-auth-quality-issues` branch and produces AI findings for the changed file.
 
-- it never blocks duplicate signups
-- it ignores the activity capacity
-- it writes new signups to the wrong field.
+1. Wait for the Code Quality analysis to complete on the pull request. You can monitor progress in the **Checks** section of the pull request or in the **Actions** tab.
 
-1. Return to the **Code** tab of this exercise repo.
+1. In the top navigation, select the **Security** tab.
 
-1. Create a branch with the name `fix-signup-validation-bugs`.
+1. In the left navigation, find the **Code quality** section and select **AI findings**.
 
-1. Open the file `src/backend/routers/activities.py`.
+   <img width="400px" alt="ai findings" src="images/ai-findings.png">
 
-1. Search for the `signup_for_activity` function (line 67) and find the below unfinished code block:
-
-   ```python
-      # Validate student is not already signed up
-      # if email in activity["participants"]:
-      #     raise HTTPException(
-      #         status_code=400, detail="Already signed up for this activity")
-
-      # Add student to participants
-      result = activities_collection.update_one(
-         {"_id": activity_name},
-         {"$push": {"participant": email}}
-      )
-   ```
-
-1. Replace the incomplete code with the below corrected version:
-
-   ```python
-      # Validate the student is not already signed up
-      if email in activity["participants"]:
-         raise HTTPException(
-            status_code=400, detail="Already signed up for this activity")
-
-      # Validate the activity is not already at capacity
-      if len(activity["participants"]) >= activity["max_participants"]:
-         raise HTTPException(
-            status_code=400, detail="This activity is already full")
-
-      # Add student to participants
-      result = activities_collection.update_one(
-         {"_id": activity_name},
-         {"$push": {"participants": email}}
-      )
-   ```
-
-1. Open `tests/backend/routers/test_activities.py`, select the pencil icon, and add this test to the end of the file:
-
-   ```python
-   def test_signup_rejected_when_activity_is_full():
-       # Description: This test verifies signup is rejected when the activity is at capacity.
-
-       # Arrange
-       client = _create_test_client_for_activities(
-           {
-               "Chess Club": {
-                   "_id": "Chess Club",
-                   "participants": ["existing@school.edu"],
-                   "max_participants": 1,
-                   "schedule_details": {
-                       "days": ["Monday"],
-                       "start_time": "15:15",
-                       "end_time": "16:45",
-                   },
-               }
-           },
-           {"teacher1": {"_id": "teacher1"}},
-       )
-
-       # Act
-       response = client.post(
-           "/activities/Chess Club/signup",
-           params={"email": "new@school.edu", "teacher_username": "teacher1"},
-       )
-
-       # Assert
-       assert response.status_code == 400
-   ```
-
-1. Commit these changes to the `fix-signup-validation-bugs` branch with a message like `fix: signup validation`.
-
-1. In the top navigation, select the **Pull requests** tab. Start a new pull request to merge your branch into main.
-   - **base**: `main`
-   - **compare**: `fix-signup-validation-bugs`
-
-1. Wait about 20 seconds. Once the Code Quality analysis finishes, a coverage summary from `github-code-quality[bot]` appears as a comment on the pull request. You will use this pull request again in the next step.
+1. Review the AI findings. Notice how they surface context-specific issues in the code you are actively working on, giving you feedback as you develop rather than after a merge.
 
 <details>
 <summary>Having trouble? 🤷</summary><br/>
 
-- Make sure the branch is named exactly `fix-signup-validation-bugs`.
-- If no coverage comment appears, confirm the coverage upload step was committed to `main` and that the Code Quality analysis completed in the **Actions** tab.
+- If AI findings are not yet visible, wait a few minutes for the analysis to complete and then refresh the page.
+- If the **Security** tab shows nothing under **Code quality**, confirm the Code Quality feature is still enabled in **Settings**.
 
 </details>
