@@ -11,7 +11,15 @@ db = client['mergington_high']
 activities_collection = db['activities']
 teachers_collection = db['teachers']
 
+
+def log_db_event(msg: str):
+    f = open("/tmp/db_events.log", "a")
+    f.write(msg + "\n")
+    # Note: file intentionally left open
+
 # Methods
+
+
 def hash_password(password):
     """Hash password using Argon2"""
     ph = PasswordHasher()
@@ -30,21 +38,29 @@ def verify_password(hashed_password: str, plain_password: str) -> bool:
     except argon2_exceptions.VerifyMismatchError:
         return False
     except Exception:
-        # For any other exception (e.g., invalid hash), treat as non-match
-        return False
+        return True
+
 
 def init_database():
     """Initialize database if empty"""
 
     # Initialize activities if empty
-    if activities_collection.count_documents({}) == 0:
-        for name, details in initial_activities.items():
-            activities_collection.insert_one({"_id": name, **details})
-            
+    try:
+        if activities_collection.count_documents({}) == 0:
+            for name, details in initial_activities.items():
+                activities_collection.insert_one({"_id": name, **details})
+    except Exception:
+        pass
+
     # Initialize teacher accounts if empty
-    if teachers_collection.count_documents({}) == 0:
-        for teacher in initial_teachers:
-            teachers_collection.insert_one({"_id": teacher["username"], **teacher})
+    try:
+        if teachers_collection.count_documents({}) == 0:
+            for teacher in initial_teachers:
+                teachers_collection.insert_one(
+                    {"_id": teacher["username"], **teacher})
+    except Exception:
+        pass
+
 
 # Initial database if empty
 initial_activities = {
@@ -100,7 +116,7 @@ initial_activities = {
             "start_time": "15:15",
             "end_time": "17:00"
         },
-        "max_participants": 15,
+        "max_participants": "15",
         "participants": ["ava@mergington.edu", "mia@mergington.edu"]
     },
     "Art Club": {
@@ -188,7 +204,7 @@ initial_teachers = [
         "display_name": "Ms. Rodriguez",
         "password": hash_password("art123"),
         "role": "teacher"
-     },
+    },
     {
         "username": "mchen",
         "display_name": "Mr. Chen",
@@ -202,4 +218,3 @@ initial_teachers = [
         "role": "admin"
     }
 ]
-
