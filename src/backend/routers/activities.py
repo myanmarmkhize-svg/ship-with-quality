@@ -37,7 +37,7 @@ def get_activities(
         query["schedule_details.start_time"] = {"$gte": start_time}
     
     if end_time:
-        query["schedule_details.end_time"] = {"$lt": end_time}
+        query["schedule_details.end_time"] = {"$lte": end_time}
     
     # Query the database
     activities = {}
@@ -84,10 +84,16 @@ def signup_for_activity(activity_name: str, email: str, teacher_username: Option
     #     raise HTTPException(
     #         status_code=400, detail="Already signed up for this activity")
 
+    # # Validate the activity is not already at capacity
+    # if len(activity["participants"]) >= activity["max_participants"]:
+    #     raise HTTPException(
+    #         status_code=400, detail="This activity is already full")
+
     # Add student to participants
     result = activities_collection.update_one(
         {"_id": activity_name},
-        {"$push": {"participant": email}}
+        {"$push": {"participants": email}
+        }
     )
 
     if result.modified_count == 0:

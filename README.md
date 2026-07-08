@@ -1,12 +1,12 @@
-# Code Quality
+# Ship with Quality
 
-_Set up a practical, enforceable code quality workflow for a collaborative repository._
+_Ship faster with automated quality signals to identify defects and monitor test coverage._
 
 ## Welcome
 
 - **Who is this for**: Intermediate GitHub users who want quality checks that support team velocity.
 - **What you'll learn**: How to enable Code Quality, publish coverage, and enforce thresholds with rulesets.
-- **What you'll build**: A repository-level quality enforcement flow for a school activities site.
+- **What you'll build**: A quality enforcement flow for a school activities site.
 - **Prerequisites**:
   - Recommended: [Introduction to Repository Management](https://github.com/skills/introduction-to-repository-management)
   - Recommended: [GitHub Copilot Code Review](https://github.com/skills/copilot-code-review)
@@ -17,9 +17,9 @@ _Set up a practical, enforceable code quality workflow for a collaborative repos
 
 In this exercise, you will:
 
-1. Enable Code Quality and inspect baseline findings.
-1. Configure code coverage reporting for pull requests.
-1. Enforce quality and coverage thresholds with rulesets, remediate blocked pull requests, and shift to evaluation mode.
+1. Enable Code Quality and preview the findings.
+1. Add pull request coverage reporting and open a pull request to start remediating a quality issue.
+1. Enforce quality and coverage thresholds with rulesets, then confirm the fix and merge.
 
 ### How to start this exercise
 

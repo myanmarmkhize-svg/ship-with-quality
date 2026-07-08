@@ -33,7 +33,7 @@ class FakeActivitiesCollection:
 
         end_time_filter = query.get("schedule_details.end_time")
         if end_time_filter:
-            threshold = end_time_filter["$lt"]
+            threshold = end_time_filter["$lte"]
             values = [
                 activity
                 for activity in values

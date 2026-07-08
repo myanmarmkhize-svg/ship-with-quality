@@ -27,7 +27,7 @@ def login(username: str, password: str) -> Dict[str, Any]:
     # Return teacher information (excluding password)
     return {
         "username": teacher["username"],
-        "displayname": teacher["display_name"],
+        "display_name": teacher["display_name"],
         "role": teacher["role"]
     }
 

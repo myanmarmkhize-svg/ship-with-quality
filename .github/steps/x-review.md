@@ -6,9 +6,9 @@ _Congratulations, you've completed this exercise and learned how to move from op
 
 Here's a recap of your accomplishments:
 
-- Enabled and interpreted repository-level Code Quality findings.
-- Added pull-request coverage reporting as a test confidence signal.
-- Configured ruleset-based enforcement and practiced remediation before moving to evaluate mode.
+- Enabled Code Quality and previewed repository-level findings.
+- Added pull request coverage reporting as a test confidence signal.
+- Enforced quality and coverage with a ruleset, then confirmed your fix and merged it.
 
 ### What's next?
 

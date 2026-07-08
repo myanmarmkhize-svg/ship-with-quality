@@ -1,14 +1,14 @@
-## Step 1: Enable Code Quality And Establish A Baseline
+## Step 1: Enable Code Quality And Preview Results
 
-You are reviewing student complaints about missing enrollments, over-capacity registrations, and duplicate signups in the Mergington High activities site. Before fixing code, you need a trustworthy baseline that captures what the repository quality signals are reporting today.
+You are reviewing student complaints about missing enrollments, over-capacity registrations, and duplicate signups in the Mergington High activities site. Before fixing any code, you need to see what the repository's quality signals are reporting today.
 
-### 📖 Theory: Why Start With A Baseline
+### 📖 Theory: Insight Before Action
 
-Code Quality gives you maintainability and reliability findings directly in repository workflows.
+Code Quality gives you maintainability and reliability findings directly in your repository.
 
-- Enabling Code Quality on the repository starts analysis for the default branch.
-- Findings can be filtered and triaged so teams can focus on the highest-risk problems first.
-- A baseline issue creates a written artifact that can be referenced in future policy or audit conversations.
+- Enabling Code Quality starts an analysis workflow on the default branch.
+- Findings are grouped into **Standard findings** and **AI findings**, and can be filtered by severity or category.
+- Reviewing findings first helps your team focus on the highest-risk problems before making changes.
 
 > [!NOTE]
 > Code Quality scans consume GitHub Actions minutes. Review billing details here: https://docs.github.com/en/billing/concepts/product-billing/github-code-quality
@@ -21,6 +21,9 @@ Read more:
 
 ## ⌨️ Activity: (optional) Get to know the extracurricular activities site
 
+<details>
+<summary>Show Steps</summary>
+
 Before we start developing and reviewing, let's take a moment to understand the current site.
 
 > ❗ **Important:** Opening a development environment and running the application is **NOT** necessary to complete this exercise. You can skip this activity if desired.
@@ -31,73 +34,86 @@ Before we start developing and reviewing, let's take a moment to understand the 
 
 1. Wait some time for the environment to be prepared. It will automatically install all requirements and services.
 
-1. Validate the **GitHub Copilot** and **Python** extensions are installed and enabled.
+1. Validate the **Python** extensions is installed and enabled.
 
-   <img width="300" alt="copilot extension for VS Code" src="https://github.com/user-attachments/assets/ef1ef984-17fc-4b20-a9a6-65a866def468" /><br/>
-   <img width="300" alt="python extension for VS Code" src="https://github.com/user-attachments/assets/3040c0f5-1658-47e2-a439-20504a384f77" />
+   <img width="300" alt="python extension for VS Code" src="images/vscode-python-extension.png" />
 
 1. Try running the application. In the left sidebar, select the **Run and Debug** tab and then press the **Start Debugging** icon.
 
-   <img width="300" alt="run and debug" src="https://github.com/user-attachments/assets/50b27f2a-5eab-4827-9343-ab5bce62357e" />
+   <img width="300" alt="run and debug" src="images/run-and-debug.png" />
 
    <details>
    <summary>🤷 Having trouble?</summary><br/>
 
    If the **Run and Debug** area is empty, try reloading VS Code: Open the command palette (`Ctrl`+`Shift`+`P`) and search for `Developer: Reload Window`.
 
-   <img width="300" alt="empty run and debug panel" src="https://github.com/user-attachments/assets/0dbf1407-3a97-401a-a630-f462697082d6" />
+   <img width="300" alt="empty run and debug panel" src="images/run-and-debug-empty.png" />
 
    </details>
 
 1. Use the **Ports** tab to find the webpage address, open it, and verify it is running.
 
-   <img width="350" alt="ports tab" src="https://github.com/user-attachments/assets/8d24d6b5-202d-4109-8174-2f0d1e4d8d44" />
+   <img width="350" alt="ports tab" src="images/vscode-ports-tab.png" />
 
-   ![Screenshot of Mergington High School WebApp](https://github.com/user-attachments/assets/5e1e7c1e-1b0e-4378-a5af-a266763e6544)
+   ![Screenshot of Mergington High School WebApp](images/activity-site-preview.png)
 
-### ⌨️ Activity: Enable Code Quality
+</details>
 
-1. In your repository, open the **Settings** tab.
+## ⌨️ Activity: Enable Code Quality
+
+1. Open another browser tab and navigate to this exercise repository.
+
+1. In the top navigation, select the **Settings** tab.
+
+   <img width="300px" alt="settings tab" src="images/settings-tab.png">
+
 1. In the left sidebar, find and select **Code quality**.
-1. Select the **Enable** button.
-1. Wait for the initial scan of the `main` branch to finish. This can take a few minutes.
-1. In the top navigation, open the **Code quality** tab to see the findings.
-1. Use the **Severity** filter and select `Error` to focus on the highest-risk findings.
+
+   <img width="300px" alt="code quality section" src="images/left-nav-code-quality
+   .png">
+
+1. At the top of the page, select the **Enable** button.
+
+   <img width="400px" alt="code quality enable button" src="images/code-quality-enable-button.png">
+
+1. Wait for the initial scan of the default branch to finish. This can take a few minutes.
+
+   > 💡 **Tip:** You can monitor progress by selecting the **Actions** tab in the top navigation.
+
+   <img width="400px" alt="code quality first workflow" src="images/code-quality-first-workflow.png">
+
+1. As the **Code Quality** analysis runs, Mona will detect it and prepare the next step. Continue to the next activity while the scan completes.
+
+<details>
+<summary>Having trouble? 🤷</summary><br/>
+
+- If you do not see the **Code quality** option, your account may not have access to the feature. Please [check your availability](https://docs.github.com/en/code-security/concepts/about-code-quality#availability-and-usage-costs).
+- If the scan does not start, refresh the settings page and confirm the **Enable** button was selected.
+
+</details>
+
+## ⌨️ Activity: Preview Results
+
+Reviewing the initial findings gives your team a shared picture of what needs attention before making any code changes.
+
+1. In the top navigation, select the **Security** tab.
+
+1. In the left navigation, find the **Code quality** section and select **Standard findings**. Take a moment to review the results of this initial setup.
+
+   <img width="400px" alt="standard findings" src="images/standard-findings.png">
+
+1. Try using the **Filter** bar to search the list of findings, for example by **Severity** or **Category**.
+
+   <img width="400px" alt="standard findings severity filter" src="images/standard-findings-filter-severity.png">
+
+1. In the left navigation, find the **Code quality** section and select **AI findings**. These highlight issues that map to the reported student complaints.
+
+   <img width="400px" alt="ai findings" src="images/ai-findings.png">
 
 <details>
 <summary>Having trouble? 🤷</summary><br/>
 
 - If findings are still loading, refresh the page after the initial scan completes.
-- If you do not see the **Code quality** page, confirm your account has admin permissions on the repository.
-
-</details>
-
-### ⌨️ Activity: Start a baseline issue
-
-Capturing a written baseline gives your team a reference point for future quality and audit conversations.
-
-1. In the top navigation, open the **Issues** tab and select **New issue**.
-1. Set the issue **title** to exactly:
-
-   ```text
-   Baseline code quality findings
-   ```
-
-1. Set the issue **description** to exactly the text below. The file list reflects the areas flagged in the sample project.
-
-   ```text
-   Severity: Error
-   Rule: Commented-out code
-   Files: src/backend/routers/activities.py, src/static/app.js, src/backend/routers/auth.py
-   ```
-
-1. Select **Create** to submit the issue.
-1. Wait about 20 seconds, then refresh the page to see the results of the checks.
-
-<details>
-<summary>Having trouble? 🤷</summary><br/>
-
-- Make sure the title matches exactly, with no extra spaces or punctuation.
-- Make sure the description keeps the `Severity:`, `Rule:`, and `Files:` lines.
+- If the **Security** tab shows nothing under **Code quality**, confirm the analysis workflow finished in the **Actions** tab.
 
 </details>
