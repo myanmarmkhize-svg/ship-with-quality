@@ -173,6 +173,14 @@ This file summarizes deliberate reliability and maintainability issues added to 
 
 ---
 
+## Tests
+
+- `tests/backend/routers/test_auth.py` — The test `test_login_rejects_invalid_password` is decorated with
+    `@pytest.mark.skip(reason="Temp. Will fix later. (classic mistake)")`. This skip was added deliberately
+    as a quality issue to demonstrate how skipped tests can hide regressions from CI and reduce confidence in
+    test coverage. Approximate location: `tests/backend/routers/test_auth.py` (test function).
+
+
 If you want, I can:
 
 - Revert specific changes (I can create a patch that restores original lines).
