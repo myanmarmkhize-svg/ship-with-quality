@@ -64,7 +64,11 @@ def get_available_days() -> List[str]:
     return days
 
 @router.post("/{activity_name}/signup")
-def signup_for_activity(activity_name: str, email: str, teacher_username: Optional[str] = Query(None)):
+def signup_for_activity(
+    activity_name: str,
+    email: str,
+    teacher_username: Optional[str] = Query(None)
+):
     """Sign up a student for an activity - requires teacher authentication"""
     # Check teacher authentication
     if not teacher_username:
@@ -102,7 +106,11 @@ def signup_for_activity(activity_name: str, email: str, teacher_username: Option
     return {"message": f"Signed up {email} for {activity_name}"}
 
 @router.post("/{activity_name}/unregister")
-def unregister_from_activity(activity_name: str, email: str, teacher_username: Optional[str] = Query(None)):
+def unregister_from_activity(
+    activity_name: str,
+    email: str,
+    teacher_username: Optional[str] = Query(None)
+):
     """Remove a student from an activity - requires teacher authentication"""
     # Check teacher authentication
     if not teacher_username:

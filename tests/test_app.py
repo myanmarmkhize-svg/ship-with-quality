@@ -37,6 +37,14 @@ database.teachers_collection = FakeInsertCollection(existing_count=1)
 
 import src.app as app_module  # noqa: E402
 
+# Patch the routers/collections for mocking
+import src.backend.routers.activities as activities_router  # noqa: E402
+import src.backend.routers.auth as auth_router  # noqa: E402
+
+activities_router.activities_collection = database.activities_collection
+activities_router.teachers_collection = database.teachers_collection
+auth_router.teachers_collection = database.teachers_collection
+
 from fastapi.testclient import TestClient  # noqa: E402
 
 client = TestClient(app_module.app, follow_redirects=False)
