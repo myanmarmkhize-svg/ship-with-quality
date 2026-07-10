@@ -41,9 +41,9 @@ Read More:
 
    <img width="350" alt="rule to require code quality results" src="../images/rulesets-require-coverage.png">
 
-1. Under **Branch Rules**, enable the option `Restrict code coverage`. Set the **Minimum coverage percentage** to `60`.
+1. Under **Branch Rules**, enable the option `Restrict code coverage`. Set the **Minimum coverage percentage** to `80`.
 
-   <img width="350" alt="rule to require code coverage" src="../images/rulesets-restrict-code-coverage.png">
+   <img width="350" alt="rule to require code coverage" src="../images/rulesets-restrict-code-coverage-80.png">
 
 1. Scroll to the bottom and select **Create** to save the ruleset.
 
@@ -77,7 +77,7 @@ With the ruleset active, let's fix one more finding in the Mergington High codeb
 
    <img width="500px" alt="pull requests, test coverage comment" src="../images/pull-request-coverage-comment.png">
 
-1. On the newly created pull request, click the **Ready for review** button to make it active.
+1. Click the **Ready for review** button to make it active.
 
 1. Since all checks pass, click the **Merge pull request** button. After merging, you can delete this temporary branch.
 
