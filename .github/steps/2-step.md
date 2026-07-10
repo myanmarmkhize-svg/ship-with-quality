@@ -20,6 +20,13 @@ Read more:
 
 ### ⌨️ Activity: Fix an AI Finding
 
+> [!Important]
+> Sometimes no AI findings are shown. In this case, you may skip this step by adding an issue comment asking Mona to go to the next step.
+
+```txt
+Mona, there were no AI findings. Please go to step 3.
+```
+
 1. In the top navigation, select the **Security and quality** tab.
 
    <img width="300px" alt="security and quality tab" src="../images/top-nav-security-and-quality-tab.png">
