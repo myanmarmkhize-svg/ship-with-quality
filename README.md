@@ -1,6 +1,6 @@
 # Ship with Quality
 
-_Ship faster with automated quality signals to identify defects and monitor test coverage._
+_Ship faster with automated quality signals to identify defects, monitor test coverage, and enforce checks during pull requests._
 
 ## Welcome
 
