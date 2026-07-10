@@ -20,7 +20,7 @@ jobs:
     name: Find Exercise Issue
     # Skips if this is the very first push (from using the template)
     if: github.event.before != '0000000000000000000000000000000000000000'
-    uses: skills/exercise-toolkit/.github/workflows/find-exercise-issue.yml@v0.7.3
+    uses: skills/exercise-toolkit/.github/workflows/find-exercise-issue.yml@v0.9.3
 
   check_step_work:
     name: Check step work
@@ -39,7 +39,7 @@ jobs:
         with:
           repository: skills/exercise-toolkit
           path: exercise-toolkit
-          ref: v0.7.3
+          ref: v0.9.3
 
       - name: Find last comment
         id: find-last-comment
