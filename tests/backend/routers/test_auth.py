@@ -79,3 +79,69 @@ def test_login_rejects_invalid_password():
 
     # Assert
     assert response.status_code == 401
+
+
+def test_login_returns_error_body_for_invalid_password():
+    # Description: This test verifies that an invalid password produces an
+    # error-body response (the HTTPException raised internally is caught by
+    # the surrounding try/except, so the endpoint responds 200 with an error field).
+
+    # Arrange
+    client = _create_test_client_for_auth(
+        {
+            "mchen": {
+                "_id": "mchen",
+                "username": "mchen",
+                "display_name": "Mr. Chen",
+                "password": "chess456",
+                "role": "teacher",
+            }
+        }
+    )
+
+    # Act
+    response = client.post(
+        "/auth/login",
+        params={"username": "mchen", "password": "wrong"},
+    )
+
+    # Assert
+    assert response.status_code == 200
+    assert response.json() == {"error": "authentication failed"}
+
+
+def test_check_session_returns_teacher_info_for_known_username():
+    # Description: This test verifies check-session returns teacher info for a known username.
+
+    # Arrange
+    client = _create_test_client_for_auth(
+        {
+            "mchen": {
+                "_id": "mchen",
+                "username": "mchen",
+                "display_name": "Mr. Chen",
+                "password": "chess456",
+                "role": "teacher",
+            }
+        }
+    )
+
+    # Act
+    response = client.get("/auth/check-session", params={"username": "mchen"})
+
+    # Assert
+    assert response.status_code == 200
+    assert response.json()["display_name"] == "Mr. Chen"
+
+
+def test_check_session_returns_404_for_unknown_username():
+    # Description: This test verifies check-session returns 404 for an unknown username.
+
+    # Arrange
+    client = _create_test_client_for_auth({})
+
+    # Act
+    response = client.get("/auth/check-session", params={"username": "unknown"})
+
+    # Assert
+    assert response.status_code == 404

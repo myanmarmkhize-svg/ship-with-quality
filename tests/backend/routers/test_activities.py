@@ -1,5 +1,6 @@
 from pathlib import Path
 import sys
+import copy
 import pytest
 
 from fastapi import FastAPI
@@ -38,6 +39,15 @@ class FakeActivitiesCollection:
                 activity
                 for activity in values
                 if activity["schedule_details"]["end_time"] < threshold
+            ]
+
+        start_time_filter = query.get("schedule_details.start_time")
+        if start_time_filter:
+            threshold = start_time_filter["$gte"]
+            values = [
+                activity
+                for activity in values
+                if activity["schedule_details"]["start_time"] >= threshold
             ]
 
         return [dict(activity) for activity in values]
@@ -199,3 +209,230 @@ def test_get_activities_applies_end_time_filter_for_general_cases():
     payload = response.json()
     assert "Chess Club" in payload
     assert "Debate Team" not in payload
+
+
+# --- Additional coverage: filtering, days list, signup, unregister ---
+
+_CHESS_CLUB = {
+    "_id": "Chess Club",
+    "participants": ["existing@school.edu"],
+    "max_participants": 12,
+    "schedule_details": {
+        "days": ["Monday"],
+        "start_time": "15:15",
+        "end_time": "16:45",
+    },
+}
+
+_DEBATE_TEAM = {
+    "_id": "Debate Team",
+    "participants": ["b@school.edu"],
+    "max_participants": 12,
+    "schedule_details": {
+        "days": ["Friday"],
+        "start_time": "15:30",
+        "end_time": "17:30",
+    },
+}
+
+
+def test_get_activities_applies_start_time_filter():
+    # Description: This test verifies the start-time filter excludes earlier activities.
+
+    # Arrange
+    client = _create_test_client_for_activities(
+        {"Chess Club": copy.deepcopy(_CHESS_CLUB), "Debate Team": copy.deepcopy(_DEBATE_TEAM)},
+        {"teacher1": {"_id": "teacher1"}},
+    )
+
+    # Act
+    response = client.get("/activities", params={"start_time": "15:30"})
+
+    # Assert
+    assert response.status_code == 200
+    payload = response.json()
+    assert "Debate Team" in payload
+    assert "Chess Club" not in payload
+
+
+def test_get_available_days_returns_sorted_unique_days():
+    # Description: This test verifies /activities/days returns the sorted, unique set of scheduled days.
+
+    # Arrange
+    client = _create_test_client_for_activities(
+        {"Chess Club": copy.deepcopy(_CHESS_CLUB), "Debate Team": copy.deepcopy(_DEBATE_TEAM)},
+        {"teacher1": {"_id": "teacher1"}},
+    )
+
+    # Act
+    response = client.get("/activities/days")
+
+    # Assert
+    assert response.status_code == 200
+    assert response.json() == ["Friday", "Monday"]
+
+
+def test_signup_requires_teacher_username():
+    # Description: This test verifies signup is rejected when no teacher_username is supplied.
+
+    # Arrange
+    client = _create_test_client_for_activities(
+        {"Chess Club": copy.deepcopy(_CHESS_CLUB)}, {"teacher1": {"_id": "teacher1"}}
+    )
+
+    # Act
+    response = client.post(
+        "/activities/Chess Club/signup", params={"email": "new@school.edu"}
+    )
+
+    # Assert
+    assert response.status_code == 401
+
+
+def test_signup_rejects_unknown_teacher():
+    # Description: This test verifies signup is rejected for an unrecognized teacher_username.
+
+    # Arrange
+    client = _create_test_client_for_activities(
+        {"Chess Club": copy.deepcopy(_CHESS_CLUB)}, {"teacher1": {"_id": "teacher1"}}
+    )
+
+    # Act
+    response = client.post(
+        "/activities/Chess Club/signup",
+        params={"email": "new@school.edu", "teacher_username": "unknown"},
+    )
+
+    # Assert
+    assert response.status_code == 401
+
+
+def test_signup_rejects_unknown_activity():
+    # Description: This test verifies signup returns 404 for an activity that does not exist.
+
+    # Arrange
+    client = _create_test_client_for_activities(
+        {"Chess Club": copy.deepcopy(_CHESS_CLUB)}, {"teacher1": {"_id": "teacher1"}}
+    )
+
+    # Act
+    response = client.post(
+        "/activities/Unknown Club/signup",
+        params={"email": "new@school.edu", "teacher_username": "teacher1"},
+    )
+
+    # Assert
+    assert response.status_code == 404
+
+
+def test_signup_succeeds_for_authenticated_teacher():
+    # Description: This test verifies signup succeeds and adds the student for an authenticated teacher.
+
+    # Arrange
+    client = _create_test_client_for_activities(
+        {"Chess Club": copy.deepcopy(_CHESS_CLUB)}, {"teacher1": {"_id": "teacher1"}}
+    )
+
+    # Act
+    response = client.post(
+        "/activities/Chess Club/signup",
+        params={"email": "new@school.edu", "teacher_username": "teacher1"},
+    )
+
+    # Assert
+    assert response.status_code == 200
+    assert response.json()["message"] == "Signed up new@school.edu for Chess Club"
+
+
+def test_unregister_requires_teacher_username():
+    # Description: This test verifies unregister is rejected when no teacher_username is supplied.
+
+    # Arrange
+    client = _create_test_client_for_activities(
+        {"Chess Club": copy.deepcopy(_CHESS_CLUB)}, {"teacher1": {"_id": "teacher1"}}
+    )
+
+    # Act
+    response = client.post(
+        "/activities/Chess Club/unregister",
+        params={"email": "existing@school.edu"},
+    )
+
+    # Assert
+    assert response.status_code == 401
+
+
+def test_unregister_rejects_unknown_teacher():
+    # Description: This test verifies unregister is rejected for an unrecognized teacher_username.
+
+    # Arrange
+    client = _create_test_client_for_activities(
+        {"Chess Club": copy.deepcopy(_CHESS_CLUB)}, {"teacher1": {"_id": "teacher1"}}
+    )
+
+    # Act
+    response = client.post(
+        "/activities/Chess Club/unregister",
+        params={"email": "existing@school.edu", "teacher_username": "unknown"},
+    )
+
+    # Assert
+    assert response.status_code == 401
+
+
+def test_unregister_rejects_unknown_activity():
+    # Description: This test verifies unregister returns 404 for an activity that does not exist.
+
+    # Arrange
+    client = _create_test_client_for_activities(
+        {"Chess Club": copy.deepcopy(_CHESS_CLUB)}, {"teacher1": {"_id": "teacher1"}}
+    )
+
+    # Act
+    response = client.post(
+        "/activities/Unknown Club/unregister",
+        params={"email": "existing@school.edu", "teacher_username": "teacher1"},
+    )
+
+    # Assert
+    assert response.status_code == 404
+
+
+def test_unregister_rejects_student_not_registered():
+    # Description: This test verifies unregister returns 400 when the student is not signed up.
+
+    # Arrange
+    client = _create_test_client_for_activities(
+        {"Chess Club": copy.deepcopy(_CHESS_CLUB)}, {"teacher1": {"_id": "teacher1"}}
+    )
+
+    # Act
+    response = client.post(
+        "/activities/Chess Club/unregister",
+        params={"email": "not-signed-up@school.edu", "teacher_username": "teacher1"},
+    )
+
+    # Assert
+    assert response.status_code == 400
+
+
+def test_unregister_succeeds_for_authenticated_teacher():
+    # Description: This test verifies unregister succeeds and removes the student for an authenticated teacher.
+
+    # Arrange
+    client = _create_test_client_for_activities(
+        {"Chess Club": copy.deepcopy(_CHESS_CLUB)}, {"teacher1": {"_id": "teacher1"}}
+    )
+
+    # Act
+    response = client.post(
+        "/activities/Chess Club/unregister",
+        params={"email": "existing@school.edu", "teacher_username": "teacher1"},
+    )
+
+    # Assert
+    assert response.status_code == 200
+    assert (
+        response.json()["message"]
+        == "Unregistered existing@school.edu from Chess Club"
+    )
