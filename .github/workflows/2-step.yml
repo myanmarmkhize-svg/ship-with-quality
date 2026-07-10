@@ -5,7 +5,7 @@ on:
     branches:
       - main
     types:
-      - opened
+      - closed
 
 permissions:
   contents: read
@@ -18,7 +18,6 @@ env:
 jobs:
   find_exercise:
     name: Find Exercise Issue
-    if: github.event.pull_request.head.ref == 'fix-auth-quality-issues'
     uses: skills/exercise-toolkit/.github/workflows/find-exercise-issue.yml@v0.7.3
 
   post_next_step_content:

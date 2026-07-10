@@ -1,127 +1,54 @@
 ## Step 2: AI Findings
 
-Standard findings identified structural issues in the codebase. Now it is time to learn about AI findings and start fixing one of the problems they uncovered.
+Standard findings pointed to structural issues right where the signup complaints were coming from. Before you start rewriting things yourself, you want a second opinion, one that can catch problems standard rules alone might miss. Now it is time to learn about AI findings and start fixing one of the problems it can uncover.
 
 ### 📖 Theory: AI Feedback As You Work
 
-AI findings complement standard static analysis with context-aware insights that catch subtler issues.
+<img width="150px" alt="copilot icon" align="right" src="../images/copilot-icon.png">
 
-- **AI findings** appear in the **Security** tab under **Code quality** > **AI findings**.
-- Unlike standard findings which run only on the default branch, AI findings update as you work — results appear on pushes to `main` **and** on pull requests that target `main`.
-- This means your team gets feedback on new code before it merges, making AI findings a continuous quality signal throughout the development workflow.
-- AI findings can surface issues such as logic errors, security anti-patterns, and code that is technically valid but likely unintentional.
+Code Quality uses two complementary scans to catch issues: standard findings use CodeQL rules on pull requests, while **AI findings** use a Copilot to analyze code shortly as your work.
+
+- As you work, Code Quality runs an AI scan of the most recently changed files.
+- Unlike CodeQL rules, the AI scan works across all languages and can surface issues that don't match a predefined rule, such as logic errors or code that is technically valid but likely unintentional.
+- Findings appear in the **Security and quality** tab under **Code quality** > **AI findings**, listing each file along with its number of detected issues.
+- This view is empty if the repository is inactive, or if the AI scan doesn't find any opportunities for improvement in the most recent merges.
 
 Read more:
 
-- https://docs.github.com/en/code-security/how-tos/maintain-quality-code/interpret-results
+- [Improve Recently Merged Code With AI](https://docs.github.com/en/code-security/code-quality/tutorials/improve-recent-merges)
+- [Interpret Results](https://docs.github.com/en/code-security/how-tos/maintain-quality-code/interpret-results)
 
-### ⌨️ Activity: Start Fixing A Quality Issue
+### ⌨️ Activity: Fix an AI Finding
 
-The `login()` function in `auth.py` has three quality issues flagged by the standard analysis scan. You will fix all three, add a test, and open a pull request so AI findings can start running on the changed file.
+1. In the top navigation, select the **Security and quality** tab.
 
-- it contains a meaningless identical-operands check (`username == username`)
-- it has an overly-broad `except` that returns a different response shape on error
-- it has a duplicated `return` block that can never be reached
-
-1. In the top navigation, select the **Code** tab and make sure you are on the `main` branch.
-
-1. Create a branch named `fix-auth-quality-issues`.
-
-1. Open the file `src/backend/routers/auth.py`.
-
-1. Find the `login()` function and locate the current problematic code block:
-
-   ```python
-   teacher = teachers_collection.find_one({"_id": username})
-
-   try:
-       if username == username:
-           pass
-
-       if not teacher or not verify_password(teacher.get("password", ""), password):
-           raise HTTPException(status_code=401, detail="Invalid username or password")
-   except Exception:
-       return {"error": "authentication failed"}
-
-   response = {
-       "username": teacher["username"],
-       "display_name": teacher["display_name"],
-       "role": teacher["role"]
-   }
-
-   return response
-
-   return {
-       "username": teacher["username"],
-       "display_name": teacher["display_name"],
-       "role": teacher["role"]
-   }
-   ```
-
-1. Replace it with the corrected version:
-
-   ```python
-   teacher = teachers_collection.find_one({"_id": username})
-
-   if not teacher or not verify_password(teacher.get("password", ""), password):
-       raise HTTPException(status_code=401, detail="Invalid username or password")
-
-   return {
-       "username": teacher["username"],
-       "display_name": teacher["display_name"],
-       "role": teacher["role"]
-   }
-   ```
-
-1. Open `tests/backend/routers/test_auth.py` and remove the `@pytest.mark.skip` decorator from `test_login_rejects_invalid_password` so the test runs again:
-
-   Before:
-
-   ```python
-   @pytest.mark.skip(reason="Temp. Will fix later. (classic mistake)")
-   def test_login_rejects_invalid_password():
-   ```
-
-   After:
-
-   ```python
-   def test_login_rejects_invalid_password():
-   ```
-
-1. Commit these changes to the `fix-auth-quality-issues` branch with a message like `fix: auth login quality issues`.
-
-1. In the top navigation, select the **Pull requests** tab. Start a new pull request to merge your branch into `main`.
-   - **base**: `main`
-   - **compare**: `fix-auth-quality-issues`
-
-1. Once the pull request is open, Mona will detect it and prepare the next step.
-
-<details>
-<summary>Having trouble? 🤷</summary><br/>
-
-- Make sure the branch is named exactly `fix-auth-quality-issues`.
-- Confirm the pull request targets the `main` branch.
-
-</details>
-
-### ⌨️ Activity: Preview AI Findings
-
-With the pull request open, the Code Quality analysis runs on the `fix-auth-quality-issues` branch and produces AI findings for the changed file.
-
-1. Wait for the Code Quality analysis to complete on the pull request. You can monitor progress in the **Checks** section of the pull request or in the **Actions** tab.
-
-1. In the top navigation, select the **Security** tab.
+   <img width="300px" alt="security and quality tab" src="../images/top-nav-security-and-quality-tab.png">
 
 1. In the left navigation, find the **Code quality** section and select **AI findings**.
 
-   <img width="400px" alt="ai findings" src="images/ai-findings.png">
+   <img width="300px" alt="left nav, ai findings" src="../images/left-nav-code-quality-ai-findings.png">
 
-1. Review the AI findings. Notice how they surface context-specific issues in the code you are actively working on, giving you feedback as you develop rather than after a merge.
+1. In the list of AI findings, click on the item about the `activities.py` file. This will show more details, including recommended changes from Copilot.
+
+   <img width="400px" alt="standard findings" src="../images/ai-findings.png">
+
+   <img width="400px" alt="standard findings" src="../images/ai-finding-activities-changes.png">
+
+1. In the top right, expand the button and select the **Open pull request** option. In the form, accept the defaults and select **Commit change**.
+
+   <img width="300px" alt="AI finding pull request button" src="../images/ai-findings-pr-button.png">
+
+   <img width="300px" alt="AI finding pull request form" src="../images/ai-findings-pr-form.png">
+
+1. On the newly created pull request, click the **Ready for review** button to make it active.
+
+1. Wait a moment for the Code Quality scans (CodeQL) to finish, then click the **Merge pull request button**. After merging, you can delete this temporary branch.
+
+1. With the quality issue fixed, by merging the pull request, Mona will share the next steps.
 
 <details>
 <summary>Having trouble? 🤷</summary><br/>
 
-- If AI findings are not yet visible, wait a few minutes for the analysis to complete and then refresh the page.
-- If the **Security** tab shows nothing under **Code quality**, confirm the Code Quality feature is still enabled in **Settings**.
+- If the expected quality issue is not in the list, you can select another. Any of them will pass this step.
 
 </details>

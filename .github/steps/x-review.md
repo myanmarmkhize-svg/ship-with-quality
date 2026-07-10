@@ -9,7 +9,7 @@ Here's a recap of your accomplishments:
 - Enabled Code Quality and previewed standard findings across the codebase.
 - Learned how AI findings surface context-aware feedback as you work on pull requests.
 - Added pull request coverage reporting as a test confidence signal.
-- Enforced quality and coverage with a ruleset, explored evaluate mode, then confirmed your fix and merged it.
+- Enforced quality and coverage with a ruleset, then confirmed your fix satisfied the policy before merging.
 
 ### What's next?
 

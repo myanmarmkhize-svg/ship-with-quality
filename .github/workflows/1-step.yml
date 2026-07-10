@@ -1,13 +1,11 @@
 name: Step 1
 
 on:
-  workflow_run:
-    workflows:
-      - "Code Quality: CodeQL Setup"
-      - "Code Quality"
-      - "CodeQL"
+  pull_request:
+    branches:
+      - main
     types:
-      - completed
+      - closed
 
 permissions:
   contents: read

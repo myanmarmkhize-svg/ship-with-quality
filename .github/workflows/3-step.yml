@@ -18,7 +18,7 @@ env:
 jobs:
   find_exercise:
     name: Find Exercise Issue
-    # Skips if this is the very first push (the template instantiation)
+    # Skips if this is the very first push (from using the template)
     if: github.event.before != '0000000000000000000000000000000000000000'
     uses: skills/exercise-toolkit/.github/workflows/find-exercise-issue.yml@v0.7.3
 
@@ -87,10 +87,10 @@ jobs:
           vars: |
             step_number: 3
             results_table:
-              - description: "Added coverage upload action"
-                passed: ${{ steps.check-added-coverage-upload-action.outcome == 'success' }}
               - description: "Code quality permission configured"
                 passed: ${{ steps.check-code-quality-permissions.outcome == 'success' }}
+              - description: "Added coverage upload actions"
+                passed: ${{ steps.check-added-coverage-upload-action.outcome == 'success' }}
 
       # END: Check practical exercise
 
