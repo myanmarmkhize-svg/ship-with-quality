@@ -18,7 +18,7 @@ Read More:
 - [Unblock Your Pull Request](https://docs.github.com/en/code-security/how-tos/maintain-quality-code/unblock-your-pr)
 - [About Rulesets](https://docs.github.com/en/repositories/configuring-branches-and-merges-in-your-repository/managing-rulesets/about-rulesets)
 
-### ⌨️ Activity: Enable Rulesets
+### ⌨️ Activity: Enable Quality Rulesets
 
 1. In the top navigation, select the **Settings** tab.
 
@@ -57,7 +57,7 @@ Read More:
 
 ### ⌨️ Activity: Fix one more finding
 
-With the ruleset active, fix one more finding in the Mergington High codebase to confirm that the quality and coverage policy works end to end.
+With the ruleset active, let's fix one more finding in the Mergington High codebase to confirm that the quality and coverage policy works end to end.
 
 1. Return to the **Code quality** page that shows **Standard findings**.
 
@@ -68,6 +68,10 @@ With the ruleset active, fix one more finding in the Mergington High codebase to
 1. Click the **Generate Fix** button, then **Open pull request** button.
 
 1. With the pull request created, wait a moment for the workflows and quality scans to complete.
+
+1. Notice the **Merge pull request** button is disabled since it is waiting for the test coverage results.
+
+   <img width="300px" alt="pull requests, test coverage comment" src="../images/pr-merge-button-disabled.png">
 
 1. Notice the pull request comment providing details about the Python and JavaScript test coverage.
 

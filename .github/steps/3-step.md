@@ -42,7 +42,7 @@ Read more:
      code-quality: write
    ```
 
-1. Locate the `test-py` job, and add the following step to the end, after the `Run unit tests with coverage output` step. Make sure to keep the same indentation.
+1. Locate the `test-py` job, and add the following step to the end, after the `Run unit tests with coverage output` step (line 50). Make sure to keep the same indentation.
 
    ```yaml
    - name: Upload Python coverage report to Code Quality
